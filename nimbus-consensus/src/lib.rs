@@ -29,11 +29,13 @@ use log::{debug, info, warn};
 use nimbus_primitives::{
 	CompatibleDigestItem, DigestsProvider, NimbusApi, NimbusId, NIMBUS_KEY_ID,
 };
+use nimbus_primitives::NIMBUS_KEY_ID;
+
 use parking_lot::Mutex;
 use sc_client_api::backend::Backend;
 use sc_consensus::{BlockImport, BlockImportParams};
 use sp_api::ProvideRuntimeApi;
-use sp_application_crypto::{ByteArray, CryptoTypePublicPair};
+use sp_application_crypto::{ByteArray, CryptoTypePublicPair, AppKey, AppPublic};
 use sp_consensus::{
 	BlockOrigin, EnableProofRecording, Environment, ProofRecording, Proposal, Proposer,
 };
@@ -221,14 +223,15 @@ where
 		// Have to convert to a typed NimbusId to pass to the runtime API. Maybe this is a clue
 		// That I should be passing Vec<u8> across the wasm boundary?
 		if let Ok(nimbus_id) = NimbusId::from_slice(&type_public_pair.1) {
-			NimbusApi::can_author(
+			/*NimbusApi::can_author(
 				&*client.runtime_api(),
-				parent.hash(),
+				parent_hash,
 				nimbus_id,
 				slot_number,
 				parent,
 			)
-			.unwrap_or_default()
+			.unwrap_or_default()*/
+			false
 		} else {
 			false
 		}
