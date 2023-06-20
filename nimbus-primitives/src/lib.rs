@@ -25,7 +25,6 @@ use sp_application_crypto::KeyTypeId;
 use sp_runtime::generic::DigestItem;
 use sp_runtime::traits::BlockNumberProvider;
 use sp_runtime::ConsensusEngineId;
-use sp_inherents::InherentData;
 #[cfg(feature = "runtime-benchmarks")]
 use sp_std::vec::{self, Vec};
 
@@ -36,27 +35,27 @@ pub use digests::CompatibleDigestItem;
 
 pub use inherents::{InherentDataProvider, INHERENT_IDENTIFIER};
 
-pub trait DigestsProvider<Id, BlockHash, InherentData> {
+pub trait DigestsProvider<Id, BlockHash> {
 	type Digests: IntoIterator<Item = DigestItem>;
-	fn provide_digests(&self, id: Id, parent: BlockHash, inherent_data: InherentData) -> Self::Digests;
+	fn provide_digests(&self, id: Id, parent: BlockHash) -> Self::Digests;
 }
 
-impl<Id, BlockHash> DigestsProvider<Id, BlockHash, InherentData> for () {
+impl<Id, BlockHash> DigestsProvider<Id, BlockHash> for () {
 	type Digests = [DigestItem; 0];
-	fn provide_digests(&self, _id: Id, _parent: BlockHash, inherent_data: InherentData) -> Self::Digests {
+	fn provide_digests(&self, _id: Id, _parent: BlockHash) -> Self::Digests {
 		[]
 	}
 }
 
-impl<F, Id, BlockHash, InherentData, D> DigestsProvider<Id, BlockHash, InherentData> for F
+impl<F, Id, BlockHash, D> DigestsProvider<Id, BlockHash> for F
 where
-	F: Fn(Id, BlockHash, InherentData) -> D,
+	F: Fn(Id, BlockHash) -> D,
 	D: IntoIterator<Item = DigestItem>,
 {
 	type Digests = D;
 
-	fn provide_digests(&self, id: Id, parent: BlockHash, inherent_data: InherentData) -> Self::Digests {
-		(*self)(id, parent, inherent_data)
+	fn provide_digests(&self, id: Id, parent: BlockHash) -> Self::Digests {
+		(*self)(id, parent)
 	}
 }
 
